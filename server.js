@@ -7,6 +7,7 @@ const courseRouter = require('./routes/course_api');
 
 const app = express()
 
+
 app.use(express.json())
 // app.use(authUser)
 
