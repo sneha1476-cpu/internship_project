@@ -6,7 +6,7 @@ const router = express.Router();
 
 router.get('/enrolled-students', (req, res) => {
     const courseId = req.query.courseId;
-    let sql = 'SELECT * FROM enrolled_students'; 
+    let sql = 'SELECT * FROM students'; 
     const params = [];
     if (courseId) {
         sql += ' WHERE course_id = ?';
