@@ -2,7 +2,7 @@ const express = require('express')
 const adminRouter = require('./routes/admin')
 const authUser = require('./utils/auth')
 const commonRouter = require('./routes/common_api')
-const videoRouter = require('./routes/video')   // ✅ ADD THIS
+const videoRouter = require('./routes/video')   
 
 const app = express()
 
@@ -13,8 +13,9 @@ app.use(authUser)
 app.use('/video', videoRouter)
 // URL:http://localhost:4000/admin/enrolled-students
 app.use('/admin', adminRouter)
-
+// URL:http://localhost:4000/auth/login
 app.use('/auth', commonRouter)
+// URL:http://localhost:4000/courses/
 app.use('/courses', commonRouter)
 
 app.listen(4000, 'localhost', () => {
