@@ -6,30 +6,89 @@ const result = require('../utils/result');
 
 const router = express.Router();
 
-router.get('/all', auth, admin, (req, res) => {
-  const sql = 'SELECT * FROM courses';
-  pool.query(sql, (err, data) => {
+router.get('/all-courses', auth, (req, res) => {
+  const { startDate, endDate } = req.query;
+
+  let sql = 'SELECT * FROM courses';
+  const params = [];
+
+  if (startDate && endDate) {
+    sql += ' WHERE start_date >= ? AND end_date <= ?';
+    params.push(startDate, endDate);
+  }
+
+  pool.query(sql, params, (err, data) => {
     res.send(result.createResult(err, data));
   });
 });
 
 router.post('/add', auth, admin, (req, res) => {
-  const sql = 'INSERT INTO courses SET ?';
-  pool.query(sql, req.body, (err) => {
-    res.send(result.createResult(err, 'Course added successfully'));
-  });
+  const {
+    courseName,
+    description,
+    fees,
+    startDate,
+    endDate,
+    videoExpireDays
+  } = req.body;
+
+  const sql = `
+    INSERT INTO courses
+    (course_name, description, fees, start_date, end_date, video_expire_days)
+    VALUES (?, ?, ?, ?, ?, ?)
+  `;
+
+  pool.query(
+    sql,
+    [courseName, description, fees, startDate, endDate, videoExpireDays],
+    (err) => {
+      res.send(result.createResult(err, 'Course added successfully'));
+    }
+  );
 });
 
-router.put('/update/:id', auth, admin, (req, res) => {
-  const sql = 'UPDATE courses SET ? WHERE course_id = ?';
-  pool.query(sql, [req.body, req.params.id], (err) => {
-    res.send(result.createResult(err, 'Course updated successfully'));
-  });
+router.put('/update/:courseId', auth, admin, (req, res) => {
+  const { courseId } = req.params;
+
+  const {
+    courseName,
+    description,
+    fees,
+    startDate,
+    endDate,
+    videoExpireDays
+  } = req.body;
+
+  const sql = `
+    UPDATE courses
+    SET course_name = ?, description = ?, fees = ?, 
+        start_date = ?, end_date = ?, video_expire_days = ?
+    WHERE course_id = ?
+  `;
+
+  pool.query(
+    sql,
+    [
+      courseName,
+      description,
+      fees,
+      startDate,
+      endDate,
+      videoExpireDays,
+      courseId
+    ],
+    (err) => {
+      res.send(result.createResult(err, 'Course updated successfully'));
+    }
+  );
 });
 
-router.delete('/delete/:id', auth, admin, (req, res) => {
+router.delete('/delete/:courseId', auth, admin, (req, res) => {
+  const { courseId } = req.params;
+
   const sql = 'DELETE FROM courses WHERE course_id = ?';
-  pool.query(sql, [req.params.id], (err) => {
+
+  pool.query(sql, [courseId], (err) => {
     res.send(result.createResult(err, 'Course deleted successfully'));
   });
 });
